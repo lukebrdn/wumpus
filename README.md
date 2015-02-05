@@ -8,6 +8,7 @@ In its current state, the gameplay is very basic. A player can move an image of 
 
 # Future improvements
 
+- Modularity using Browserify
 - Hide a wumpus creature randomly in one of the rooms
 - Add hidden pits
 - Add a hidden sword necessary to kill the wumpus
