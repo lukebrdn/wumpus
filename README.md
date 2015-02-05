@@ -15,4 +15,4 @@ In its current state, the gameplay is very basic. A player can move an image of 
 
 # Why I make this? 
 
-I am build this as an exercise to improve my Javascript skills. My friend and coffeeschool professor, @jackolantern, gave me the idea to attempt this, and has been gracious enough to offer feedback and help during the process.
+I built this as an exercise to improve my Javascript skills. My friend and coffeeschool professor, @jackolantern, gave me the idea to attempt this and has graciously offerred feedback and help during the process.
