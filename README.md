@@ -13,6 +13,6 @@ In its current state, the gameplay is very basic. A player can move an image of 
 - Add a hidden sword necessary to kill the wumpus
 - Add a way to measure life (deep, I know)
 
-# Why did you make this? 
+# Why I you make this? 
 
-I am build this as an exercise to improve my Javascript skills. My friend and coffeeschool professor, @jackolanter, gave me the idea to attempt this, and has been gracious enough to offer feedback and help during the process.
+I am build this as an exercise to improve my Javascript skills. My friend and coffeeschool professor, @jackolantern, gave me the idea to attempt this, and has been gracious enough to offer feedback and help during the process.
