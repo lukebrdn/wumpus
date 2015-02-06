@@ -9,8 +9,7 @@ In its current state, the gameplay is very basic. A player can move an image of 
 # Future improvements
 
 - Improve the interface
-- Hide a wumpus creature randomly in one of the rooms
-- Add hidden pits
+- Add messaging, so player knows if it is close to the wumpus or pits
 - Add a hidden sword necessary to kill the wumpus
 - Add a way to measure life (deep, I know)
 
