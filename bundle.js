@@ -1,6 +1,7 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 var Dungeon = function() {
   this.rooms = [];
+  this.pits = [];
 };
 
 Dungeon.prototype.addRm = function() {
@@ -39,6 +40,16 @@ Dungeon.prototype.connectLvls = function(lvl1,lvl2) {
   }
 };
 
+Dungeon.prototype.randomRm = function() {
+  return Math.ceil(Math.random() * (this.rooms.length - 1));
+};
+
+Dungeon.prototype.hidePits = function(numberOfPits) {
+  for(var i = 0; i < numberOfPits; i++) {
+    this.pits.push(this.randomRm());
+  } 
+};
+
 module.exports = Dungeon;
 
 
@@ -47,15 +58,24 @@ module.exports = Dungeon;
 },{}],2:[function(require,module,exports){
 var Player = require('./player.js');
 var Dungeon = require('./dungeon.js');
+var Wumpus = require('./wumpus.js');
 
 var Game = function() {
   this.player = new Player();
   this.dungeon = new Dungeon();
+  this.wumpus = new Wumpus();
 };
 
 Game.prototype.start = function() {
+  // builds two levels of five rooms. 
   this.dungeon.connectLvls(this.dungeon.buildLvl(5),this.dungeon.buildLvl(5));
-  return "dungeon built";
+  
+  // sets location of the wumpus
+  this.wumpus.location = this.dungeon.randomRm();
+
+  // generates 3 pits
+  this.dungeon.hidePits(3);
+  return "dungeon built and wumpus exists";
 };
 
 Game.prototype.move = function() {
@@ -89,7 +109,7 @@ Game.prototype.move = function() {
 };
 
 module.exports = Game;
-},{"./dungeon.js":1,"./player.js":3}],3:[function(require,module,exports){
+},{"./dungeon.js":1,"./player.js":3,"./wumpus.js":5}],3:[function(require,module,exports){
 var Player = function() {
   this.location = 0;
 };
@@ -102,41 +122,48 @@ var View = function() {
   this.game = new Game();
 };
 
-View.prototype.display = function() {
+View.prototype.display = function(character, className) {
   var roomNames = ['zero','one','two','three','four','five','six','seven','eight','nine'];
-  var locationId = roomNames[this.game.player.location];
+  var locationId = roomNames[character.location];
 
-  if(document.getElementsByClassName('hunter').length > 0) {
-    var divId = document.getElementsByClassName('hunter')[0].id;
-    document.getElementById(divId).classList.remove('hunter');
+  if(document.getElementsByClassName(className).length > 0) {
+    var divId = document.getElementsByClassName(className)[0].id;
+    document.getElementById(divId).classList.remove(className);
   }
-  document.getElementById(locationId).classList.add('hunter');
+  document.getElementById(locationId).classList.add(className);
 };
 
 View.prototype.keyHandler = function(e) {
     if (e.keyCode === 37) {
       this.game.move().left();
-      this.display();
+      this.display(this.game.player, 'hunter');
   }
   if (e.keyCode === 38) {
       this.game.move().up();
-      this.display();
+      this.display(this.game.player, 'hunter');
   }
   if (e.keyCode === 39) {
       this.game.move().right();
-      this.display();
+      this.display(this.game.player, 'hunter');
   }
   if (e.keyCode === 40) {
       this.game.move().down();
-      this.display();
+      this.display(this.game.player, 'hunter');
   }
 };
 
 var wumpus = new View;
 wumpus.game.start();
-wumpus.display();
+wumpus.display(wumpus.game.player, 'hunter');
+wumpus.display(wumpus.game.wumpus, 'wumpus');
 
 document.onkeydown = function(e) {
   wumpus.keyHandler(e);
 };
-},{"./game.js":2}]},{},[4]);
+},{"./game.js":2}],5:[function(require,module,exports){
+var Wumpus = function() {
+	this.location = 0;
+};
+
+module.exports = Wumpus;
+},{}]},{},[4]);
