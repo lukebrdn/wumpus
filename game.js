@@ -50,4 +50,40 @@ Game.prototype.move = function() {
   };
 };
 
+Game.prototype.message = function() {
+  var playerRm = this.dungeon.rooms[this.player.location];
+  var wumpusLoc = this.wumpus.location;
+  var pits = this.dungeon.pits;
+
+  if (playerRm.id === wumpusLoc) {
+    return "ran into the wumpus without a proper weapon. we're dead";
+  } else if (playerRm.adjacentRm1 === wumpusLoc || playerRm.adjacentRm2 === wumpusLoc || playerRm.nextLvlRm === wumpusLoc)  {
+    return "you smell that? we should watch out fo dat wumpus";
+  } else if (pits.indexOf(playerRm.adjacentRm1) !== -1 || pits.indexOf(playerRm.adjacentRm2) !== -1 || pits.indexOf(playerRm.nextLvlRm) !== -1) {
+    return "i pity the fool that falls into that pit";
+  } else if (pits.indexOf(playerRm.id) !== -1) {
+    return "dang, we the fool that fell into a pit";
+  }
+
+  return "smells fine to me";
+};
+
 module.exports = Game;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
