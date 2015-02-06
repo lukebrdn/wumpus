@@ -108,7 +108,44 @@ Game.prototype.move = function() {
   };
 };
 
+Game.prototype.message = function() {
+  var playerRm = this.dungeon.rooms[this.player.location];
+  var wumpusLoc = this.wumpus.location;
+  var pits = this.dungeon.pits;
+
+  if (playerRm.id === wumpusLoc) {
+    return "ran into the wumpus without a proper weapon. we're dead";
+  } else if (playerRm.adjacentRm1 === wumpusLoc || playerRm.adjacentRm2 === wumpusLoc || playerRm.nextLvlRm === wumpusLoc)  {
+    return "you smell that? we should watch out fo dat wumpus";
+  } else if (pits.indexOf(playerRm.adjacentRm1) !== -1 || pits.indexOf(playerRm.adjacentRm2) !== -1 || pits.indexOf(playerRm.nextLvlRm) !== -1) {
+    return "i pity the fool that falls into that pit";
+  } else if (pits.indexOf(playerRm.id) !== -1) {
+    return "dang, we the fool that fell into a pit";
+  }
+
+  return "smells fine to me";
+};
+
 module.exports = Game;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 },{"./dungeon.js":1,"./player.js":3,"./wumpus.js":5}],3:[function(require,module,exports){
 var Player = function() {
   this.location = 0;
@@ -133,22 +170,31 @@ View.prototype.display = function(character, className) {
   document.getElementById(locationId).classList.add(className);
 };
 
+View.prototype.displayMessage = function() {
+  var messageArea = document.getElementById('message-area');
+  messageArea.innerHTML = this.game.message();
+};
+
 View.prototype.keyHandler = function(e) {
     if (e.keyCode === 37) {
       this.game.move().left();
       this.display(this.game.player, 'hunter');
+      this.displayMessage();
   }
   if (e.keyCode === 38) {
       this.game.move().up();
       this.display(this.game.player, 'hunter');
+      this.displayMessage();
   }
   if (e.keyCode === 39) {
       this.game.move().right();
       this.display(this.game.player, 'hunter');
+      this.displayMessage();
   }
   if (e.keyCode === 40) {
       this.game.move().down();
       this.display(this.game.player, 'hunter');
+      this.displayMessage();
   }
 };
 
@@ -156,6 +202,7 @@ var wumpus = new View;
 wumpus.game.start();
 wumpus.display(wumpus.game.player, 'hunter');
 wumpus.display(wumpus.game.wumpus, 'wumpus');
+wumpus.displayMessage();
 
 document.onkeydown = function(e) {
   wumpus.keyHandler(e);
