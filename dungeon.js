@@ -1,5 +1,6 @@
 var Dungeon = function() {
   this.rooms = [];
+  this.pits = [];
 };
 
 Dungeon.prototype.addRm = function() {
@@ -36,6 +37,16 @@ Dungeon.prototype.connectLvls = function(lvl1,lvl2) {
     this.rooms[lvl1[i]].nextLvlRm = lvl2[i];
     this.rooms[lvl2[i]].nextLvlRm = lvl1[i];
   }
+};
+
+Dungeon.prototype.randomRm = function() {
+  return Math.ceil(Math.random() * (this.rooms.length - 1));
+};
+
+Dungeon.prototype.hidePits = function(numberOfPits) {
+  for(var i = 0; i < numberOfPits; i++) {
+    this.pits.push(this.randomRm());
+  } 
 };
 
 module.exports = Dungeon;

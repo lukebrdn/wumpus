@@ -14,6 +14,11 @@ body {
 	background-size: 100% 100%;
 }
 
+.wumpus {
+	background:url('iu.jpeg') no-repeat center;
+	background-size: 100% 100%;
+}
+
 .flex-parent-col {
 	display: -webkit-flex;
 	-webkit-flex-direction: column;

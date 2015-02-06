@@ -1,14 +1,23 @@
 var Player = require('./player.js');
 var Dungeon = require('./dungeon.js');
+var Wumpus = require('./wumpus.js');
 
 var Game = function() {
   this.player = new Player();
   this.dungeon = new Dungeon();
+  this.wumpus = new Wumpus();
 };
 
 Game.prototype.start = function() {
+  // builds two levels of five rooms. 
   this.dungeon.connectLvls(this.dungeon.buildLvl(5),this.dungeon.buildLvl(5));
-  return "dungeon built";
+  
+  // sets location of the wumpus
+  this.wumpus.location = this.dungeon.randomRm();
+
+  // generates 3 pits
+  this.dungeon.hidePits(3);
+  return "dungeon built and wumpus exists";
 };
 
 Game.prototype.move = function() {
