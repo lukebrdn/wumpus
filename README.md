@@ -1,2 +1,20 @@
-# wumpus
-A basic javascript game based on Hunt the Wumpus written by Gregory Yob
+# Wumpus
+
+Wumpus is a game written in Javascript. It's based on a game written by Gregory Yop, Hunt the Wumpus. 
+
+# Gameplay
+
+In its current state, the gameplay is very basic. A player can move an image of the actor, Mr. T, around a board of rooms using the arrow keys on their keyboard. 
+
+# Future improvements
+
+- Modularity using Browserify
+- Improve the interface
+- Hide a wumpus creature randomly in one of the rooms
+- Add hidden pits
+- Add a hidden sword necessary to kill the wumpus
+- Add a way to measure life (deep, I know)
+
+# Why I make this? 
+
+I built this as an exercise to improve my Javascript skills. My friend and coffeeschool professor, @jackolantern, gave me the idea to attempt this and has graciously offerred feedback and help during the process.
