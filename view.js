@@ -8,7 +8,7 @@ View.prototype.display = function(character, className) {
   var roomNames = ['zero','one','two','three','four','five','six','seven','eight','nine'];
   var locationId = roomNames[character.location];
 
-  if(document.getElementsByClassName(className).length > 0) {
+   
     var divId = document.getElementsByClassName(className)[0].id;
     document.getElementById(divId).classList.remove(className);
   }
@@ -43,7 +43,7 @@ View.prototype.keyHandler = function(e) {
   }
 };
 
-var wumpus = new View;
+var wumpus = new View();
 wumpus.game.start();
 wumpus.display(wumpus.game.player, 'hunter');
 wumpus.display(wumpus.game.wumpus, 'wumpus');
@@ -52,3 +52,5 @@ wumpus.displayMessage();
 document.onkeydown = function(e) {
   wumpus.keyHandler(e);
 };
+
+module.exports = View;

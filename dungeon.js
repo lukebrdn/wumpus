@@ -50,6 +50,3 @@ Dungeon.prototype.hidePits = function(numberOfPits) {
 };
 
 module.exports = Dungeon;
-
-
-
