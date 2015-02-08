@@ -6,12 +6,17 @@ var Game = function() {
   this.player = new Player();
   this.dungeon = new Dungeon();
   this.wumpus = new Wumpus();
+  this.started = false;
 };
 
 Game.prototype.start = function() {
+  if(this.started) { 
+    return "already started";
+  }
+  this.started = true;
   // builds two levels of five rooms. 
   this.dungeon.connectLvls(this.dungeon.buildLvl(5),this.dungeon.buildLvl(5));
-  
+
   // sets location of the wumpus
   this.wumpus.location = this.dungeon.randomRm();
 
@@ -25,11 +30,11 @@ Game.prototype.move = function() {
   return {
     left: function() {
       self.player.location = self.dungeon.rooms[self.player.location].adjacentRm1;
-      return "player moved left to room " + self.player.location;
+      return "player moved left";
     },
     right: function() {
       self.player.location = self.dungeon.rooms[self.player.location].adjacentRm2;
-      return "player moved right to room " + self.player.location;
+      return "player moved right ";
     },
     up: function() {
       if (self.player.location < self.dungeon.rooms[self.player.location].nextLvlRm) {
@@ -69,21 +74,3 @@ Game.prototype.message = function() {
 };
 
 module.exports = Game;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
