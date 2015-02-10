@@ -12,7 +12,8 @@ Dungeon.prototype.addRm = function() {
                       adjacentRm2: null,
                       nextLvlRm: null,
                       wumpus: false,
-                      pit: false
+                      pit: false,
+                      sword: false
                     });
                     
                     return roomId;
