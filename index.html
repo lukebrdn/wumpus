@@ -1,27 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="stylesheet" type="text/css" href="main.css" />
-	</head>
-	<body>
-		<div id="game" class="flex-parent-col">
-			<h1>Hunt.</h1>
-			<div id="map-window">
-				<div id="zero" class="room"></div>
-				<div id="one" class="room"></div>
-				<div id="two" class="room"></div>
-				<div id="three" class="room"></div>
-				<div id="four" class="room"></div>
-				<div id="five" class="room"></div>
-				<div id="six" class="room"></div>
-				<div id="seven" class="room"></div>
-				<div id="eight" class="room"></div>
-				<div id="nine" class="room"></div>
-			</div>
-			<div id="message-area"></div>
-			<p>Use arrow keys to move around</p>
-		</div>
-		<script src="bundle.js"></script>
-	</body>
+    <head>
+        <meta charset="utf-8" />
+
+        <!-- Main Styles -->
+        <link rel="stylesheet" type="text/css" href="main.css" />
+
+        <!-- Javascript Libraries -->
+        <script charset="utf-8" src="vendor/js/d3.js"></script>
+        <script charset="utf-8" src="vendor/js/jquery.min.js"></script>
+    </head>
+    <body>
+        <div id="intro">Use arrow keys to move around the dungeon.</div>
+        <div id="graph"></div>
+        <div id="message-area"></div>
+
+        <svg id="mySvg" width="80" height="80">
+          <defs id="mdef">
+            <pattern id="toon" x="0" y="0" height="40" width="40">
+              <image x="0" y="0" width="40" height="40" xlink:href="mrt.jpg"></image>
+            </pattern>
+          </defs>
+        </svg>
+        
+        <script charset="utf-8" src="bundle.js"></script>
+    </body>
 </html>
+
