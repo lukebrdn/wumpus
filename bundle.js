@@ -13,7 +13,8 @@ Dungeon.prototype.addRm = function() {
                       adjacentRm2: null,
                       nextLvlRm: null,
                       wumpus: false,
-                      pit: false
+                      pit: false,
+                      sword: false
                     });
                     
                     return roomId;
@@ -74,17 +75,18 @@ Game.prototype.start = function() {
                 this.started = true;
 
                 var d = this.dungeon;
-                var w = this.wumpus;
 
                 // builds two levels of five rooms. 
-                d.connectLvls(d.buildLvl(5),d.buildLvl(5));
+                d.connectLvls(d.buildLvl(7),d.buildLvl(7));
 
                 // sets location of the wumpus
                 this.hideWumpus();
 
                 // generates 2 pits
                 this.hidePits(2);
-                return "dungeon built and wumpus exists";
+
+                // hides sword
+                this.hideSword();
               };
 
 Game.prototype.hideWumpus = function() {
@@ -112,6 +114,19 @@ Game.prototype.hidePits = function(numberOfPits) {
                 } 
               };
 
+Game.prototype.hideSword = function() {
+                var w = this.wumpus;
+                var rooms = this.dungeon.rooms;
+                var swordRoom = this.randomRm(this.wumpus.location);
+                
+                while (rooms[swordRoom].pit || rooms[swordRoom].wumpus) {
+                  swordRoom = this.randomRm(w.location);
+                }
+
+                rooms[swordRoom].sword = true;
+                return rooms[swordRoom];
+              };
+
 Game.prototype.randomRm = function(roomToExlude) {
                 var room = Math.ceil(Math.random() * (this.dungeon.rooms.length - 1));
                 while(room === roomToExlude) {
@@ -124,44 +139,53 @@ Game.prototype.move = function() {
                 var p = this.player;
                 var rooms = this.dungeon.rooms;
 
+                var self = this;
+
                 return {
                   left: function() {
                     p.location = rooms[p.location].adjacentRm1;
+                    self.isSwordInRoom();
                   },
                   right: function() {
                     p.location = rooms[p.location].adjacentRm2;
+                    self.isSwordInRoom();
                   },
                   up: function() {
                     if (p.location < rooms[p.location].nextLvlRm) {
                       p.location = rooms[p.location].nextLvlRm;
+                      self.isSwordInRoom();
                     }
                   },
                   down: function() {
                     if (p.location > rooms[p.location].nextLvlRm) {
                       p.location = rooms[p.location].nextLvlRm;
+                      self.isSwordInRoom();
                     }
                   }
                 };
               };
 
-Game.prototype.doesPlayerDie = function() {
+Game.prototype.isPlayerDead = function() {
                 var p = this.player;
                 var w = this.wumpus;
                 var pits = this.dungeon.pits;
 
-                // killed by the wumpus
+                // same room as the wumpus
                 if(p.location === w.location) {
+                  if(p.hasSword) {
+                    return false;
+                  }
                   p.dead = true;
-                  return 1;
+                  return true;
                 }
-                // fell into a pit
+
+                // player dies if same room as the pit
                 if(pits.indexOf(p.location) !== -1) {
                   p.dead = true;
-                  return 2;
+                  return true;
                 }
 
-                return 0;
-
+                return false;
               };
 
 Game.prototype.arePitsNearby = function() {
@@ -202,6 +226,19 @@ Game.prototype.isWumpusNearby = function() {
 
               };
 
+Game.prototype.isSwordInRoom = function() {
+                var p = this.player;
+                var rooms = this.dungeon.rooms;  
+                
+                if(rooms[p.location].sword) {
+                  p.hasSword = true;
+                  return true;
+                } else {
+                  return false;
+                }
+
+              };
+
 
 module.exports = Game;
 
@@ -219,7 +256,6 @@ var Game = require('./game.js');
 var View = function() {
   this.game = new Game();
 };
-
 
 /*
  * Loops must be passed in from the outermost loop to the innermost loop.*
@@ -342,17 +378,44 @@ View.prototype.displayMessage = function() {
             };
 
 View.prototype.message = function() {
-                if(this.game.doesPlayerDie() == 1) {
-                    return "Mr. T says: \n Dang, we got a wompus from the wumpus. We're dead fool!";
-                } else if (this.game.doesPlayerDie() == 2) {
-                    return "Mr. T says: \n Dang, we da fool dat fell in to da pit. We're dead fool!";
-                } else if (this.game.arePitsNearby()) {
-                    return "Mr. T says: \n I pity da fool that'd fall in to dat pit.";
-                } else if (this.game.isWumpusNearby()) {
-                    return "Mr. T says: \n Whoa, watch out fool. I smell a wumpus in the next room.";
+                var message = "Mr. T says:";
+                
+                var count = 0;
+                if(this.game.isSwordInRoom()) {
+                    message += " We found the sword. Let's get that wumpus.";
+                    count++;
                 }
 
-                return "Mr. T says: Everything smells fine.";
+                if(this.game.arePitsNearby()) {
+                    message += " There's a pit nearby. Watch out fool.";
+                    count++;
+                }
+
+                if(this.game.isWumpusNearby()) {
+                    message += " I smell a wumpus. I hope you brought your sword.";
+                    count++;
+                }
+
+                if(this.game.isPlayerDead()) {
+                    message += " Dang, we're dead fool.";
+                    count++;
+                }
+
+                if(this.game.player.location === this.game.wumpus.location) {
+                    if(this.game.player.hasSword) {
+                        message = "Mr. T says: That's one dead wumpus.";
+                        count++;
+                    } else {
+                        messsage += " We should have brought a sword."
+                        count++;
+                    }
+                }
+
+                if(count === 0) {
+                    message += " We're safe, for now.";
+                }
+
+                return message;
             };
 
 View.prototype.keyHandler = function(e) {
@@ -397,7 +460,7 @@ var wumpus = new View();
 wumpus.game.start();
 wumpus.drawGraph("#graph", wumpus.game);
 wumpus.displayMessage();
-console.log(wumpus.game.dungeon.pits, wumpus.game.wumpus.location);
+console.log(wumpus.game.dungeon.rooms, wumpus.game.player);
 
 document.onkeydown = function(e) {
             wumpus.keyHandler(e);

@@ -4,7 +4,6 @@ var View = function() {
   this.game = new Game();
 };
 
-
 /*
  * Loops must be passed in from the outermost loop to the innermost loop.*
  */
@@ -126,17 +125,44 @@ View.prototype.displayMessage = function() {
             };
 
 View.prototype.message = function() {
-                if(this.game.doesPlayerDie() == 1) {
-                    return "Mr. T says: \n Dang, we got a wompus from the wumpus. We're dead fool!";
-                } else if (this.game.doesPlayerDie() == 2) {
-                    return "Mr. T says: \n Dang, we da fool dat fell in to da pit. We're dead fool!";
-                } else if (this.game.arePitsNearby()) {
-                    return "Mr. T says: \n I pity da fool that'd fall in to dat pit.";
-                } else if (this.game.isWumpusNearby()) {
-                    return "Mr. T says: \n Whoa, watch out fool. I smell a wumpus in the next room.";
+                var message = "Mr. T says:";
+                
+                var count = 0;
+                if(this.game.isSwordInRoom()) {
+                    message += " We found the sword. Let's get that wumpus.";
+                    count++;
                 }
 
-                return "Mr. T says: Everything smells fine.";
+                if(this.game.arePitsNearby()) {
+                    message += " There's a pit nearby. Watch out fool.";
+                    count++;
+                }
+
+                if(this.game.isWumpusNearby()) {
+                    message += " I smell a wumpus. I hope you brought your sword.";
+                    count++;
+                }
+
+                if(this.game.isPlayerDead()) {
+                    message += " Dang, we're dead fool.";
+                    count++;
+                }
+
+                if(this.game.player.location === this.game.wumpus.location) {
+                    if(this.game.player.hasSword) {
+                        message = "Mr. T says: That's one dead wumpus.";
+                        count++;
+                    } else {
+                        messsage += " We should have brought a sword."
+                        count++;
+                    }
+                }
+
+                if(count === 0) {
+                    message += " We're safe, for now.";
+                }
+
+                return message;
             };
 
 View.prototype.keyHandler = function(e) {
@@ -181,7 +207,7 @@ var wumpus = new View();
 wumpus.game.start();
 wumpus.drawGraph("#graph", wumpus.game);
 wumpus.displayMessage();
-console.log(wumpus.game.dungeon.pits, wumpus.game.wumpus.location);
+console.log(wumpus.game.dungeon.rooms, wumpus.game.player);
 
 document.onkeydown = function(e) {
             wumpus.keyHandler(e);
