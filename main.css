@@ -1,172 +1,18 @@
-body {
-	margin: 0;
+div#graph {
+	text-align: center;
 }
 
-.room {
-	height: 30px;
-	width: 30px;
-	background-color: #eee;
-	position: absolute;
-}
-
-.hunter {
-	background:url('mrt.jpg') no-repeat center;
-	background-size: 100% 100%;
-}
-
-.wumpus {
-	background:url('iu.jpeg') no-repeat center;
-	background-size: 100% 100%;
-}
-
-.flex-parent-col {
-	display: -webkit-flex;
-	-webkit-flex-direction: column;
-}
-
-.flex-parent-row {
-	display: -webkit-flex;
-	-webkit-flex-direction: row;
-}
-
-#game {
-	background-color: white;
-	height: 100vh;
-	min-height: 430px;
-}
-
-#game h1 {
-	color:#fff;
-	-webkit-flex-grow: 1;
-}
-
-#map-window {
-	-webkit-flex-grow: 10;
-
-	border: 8px dashed #222;
-	position: relative;
-	background-color: #333;
-}
-
-#map-window #zero:before {
-	content: '0';
-}
-
-#map-window #one {
-	top: 90px;
-}
-
-#map-window #one:before {
-	content: '1';
-}
-
-#map-window #two {
-	top: 180px;
-}
-
-#map-window #two:before {
-	content: '2';
-}
-
-#map-window #three {
-	right: 0;
-	top: 180px;
-}
-
-#map-window #three:before {
-	content: '3';
-}
-
-#map-window #four {
-	right: 0;
-	top: 0;
-}
-
-#map-window #four:before {
-	content: '4';
-}
-
-#map-window #five {
-	left:65px;
-	top: 35px;
-}
-
-#map-window #five:before {
-	content: '5';
-}
-
-#map-window #six {
-	left:65px;
-	top: 95px;
-}
-
-#map-window #six:before {
-	content: '6';
-}
-
-#map-window #seven {
-	left:65px;
-	top: 155px;
-}
-
-#map-window #seven:before {
-	content: '7';
-}
-
-#map-window #eight {
-	right:65px;
-	top: 155px;
-}
-
-#map-window #eight:before {
-	content: '8';
-}
-
-#map-window #nine {
-	right:65px;
-	top: 35px;
-}
-
-#map-window #nine:before {
-	content: '9';
+svg circle.toon {
+	fill: url(#toon) !important;
 }
 
 #message-area {
-	color: lightgreen;
 	text-align: center;
-	padding-top: 25px;
-	-webkit-flex-grow: 1;
-}
+	height: 100px;
+	width: 80%;
+	margin: 0 auto;
 
-#game form {
-	-webkit-flex-grow: 1;
-	-webkit-justify-content:space-between;
-
-	background-color: #444;
-	max-height: 40px;
-	width: 100%;
-	height: 100%;
-	color: lightgreen; 
-}
-
-#game form label {
-		-webkit-flex-grow: 1;
-}
-
-#game form #input {
-		-webkit-flex-grow: 5;
-
-	font-size: 24px;
-}
-
-
-#submit-button {
-
-	-webkit-flex-grow: 2;
-}
-
-#start {
-	height: 30px;
-	width: 60px;
-	background-color: blue;
+	font-family: "monaco", monospace, sans-serif;
+	font-size: 2em;
+	color: #333;
 }

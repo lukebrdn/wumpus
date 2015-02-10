@@ -14,10 +14,6 @@ describe("Wompus tests", function() {
 		expect(game1.wumpus.location > 0 && game1.wumpus.location < game1.dungeon.rooms.length).toBe(true);
 	});
 
-	it('dungeon build', function() {
-		
-	});
-
 	it('player move left', function() {
 		var roomId = game1.player.location;
 		game1.move().left();
