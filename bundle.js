@@ -1,154 +1,215 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 var Dungeon = function() {
-  this.rooms = [];
-  this.pits = [];
-};
+      this.rooms = [];
+      this.pits = [];
+    };
 
 Dungeon.prototype.addRm = function() {
-  var roomId = this.rooms.length;
-  this.rooms.push({
-    id: roomId,
-    adjacentRm1: null,
-    adjacentRm2: null,
-    nextLvlRm: null
-  });
-  return roomId;
-};
+                    var roomId = this.rooms.length;
+                    
+                    this.rooms.push({
+                      id: roomId,
+                      adjacentRm1: null,
+                      adjacentRm2: null,
+                      nextLvlRm: null,
+                      wumpus: false,
+                      pit: false
+                    });
+                    
+                    return roomId;
+                  };
 
 Dungeon.prototype.buildLvl = function(size) {
-  var level = [];
-  var initialRmId = this.addRm();
-  var prevRmId = initialRmId;
-  level.push(initialRmId);
-  for(var i = 0; i < size-1; i++) {
-    var roomId = this.addRm();
-    level.push(roomId);
-    this.rooms[roomId].adjacentRm2 = prevRmId;
-    this.rooms[prevRmId].adjacentRm1 = roomId;
-    prevRmId = roomId;
-  }
-  this.rooms[initialRmId].adjacentRm2 = prevRmId;
-  this.rooms[prevRmId].adjacentRm1 = initialRmId;
-  return  level;
-};
+                    var level = [];
+                    var initialRmId = this.addRm();
+                    var prevRmId = initialRmId;
+                    
+                    level.push(initialRmId);
+                    
+                    for(var i = 0; i < size-1; i++) {
+                      var roomId = this.addRm();
+                      level.push(roomId);
+                      this.rooms[roomId].adjacentRm2 = prevRmId;
+                      this.rooms[prevRmId].adjacentRm1 = roomId;
+                      prevRmId = roomId;
+                    }
+                    
+                    this.rooms[initialRmId].adjacentRm2 = prevRmId;
+                    this.rooms[prevRmId].adjacentRm1 = initialRmId;
+                    
+                    return  level;
+                  };
 
 Dungeon.prototype.connectLvls = function(lvl1,lvl2) {
-  // join levels at each room
-  for(var i = 0; i < lvl1.length; i++) {
-    this.rooms[lvl1[i]].nextLvlRm = lvl2[i];
-    this.rooms[lvl2[i]].nextLvlRm = lvl1[i];
-  }
-};
+                    var rooms = this.rooms;
+
+                    // join levels at each room
+                    for(var i = 0; i < lvl1.length; i++) {
+                      rooms[lvl1[i]].nextLvlRm = lvl2[i];
+                      rooms[lvl2[i]].nextLvlRm = lvl1[i];
+                    }
+                  };
 
 Dungeon.prototype.randomRm = function() {
-  return Math.ceil(Math.random() * (this.rooms.length - 1));
-};
-
-Dungeon.prototype.hidePits = function(numberOfPits) {
-  for(var i = 0; i < numberOfPits; i++) {
-    this.pits.push(this.randomRm());
-  } 
-};
+                    return Math.ceil(Math.random() * (this.rooms.length - 1));
+                  };
 
 module.exports = Dungeon;
-
-
-
-
 },{}],2:[function(require,module,exports){
 var Player = require('./player.js');
 var Dungeon = require('./dungeon.js');
 var Wumpus = require('./wumpus.js');
 
 var Game = function() {
-  this.player = new Player();
-  this.dungeon = new Dungeon();
-  this.wumpus = new Wumpus();
-};
+      this.player = new Player();
+      this.dungeon = new Dungeon();
+      this.wumpus = new Wumpus();
+      this.started = false;
+    };
 
 Game.prototype.start = function() {
-  // builds two levels of five rooms. 
-  this.dungeon.connectLvls(this.dungeon.buildLvl(5),this.dungeon.buildLvl(5));
-  
-  // sets location of the wumpus
-  this.wumpus.location = this.dungeon.randomRm();
+                if(this.started) { 
+                  return "already started";
+                }
+                this.started = true;
 
-  // generates 3 pits
-  this.dungeon.hidePits(3);
-  return "dungeon built and wumpus exists";
-};
+                var d = this.dungeon;
+                var w = this.wumpus;
+
+                // builds two levels of five rooms. 
+                d.connectLvls(d.buildLvl(5),d.buildLvl(5));
+
+                // sets location of the wumpus
+                this.hideWumpus();
+
+                // generates 2 pits
+                this.hidePits(2);
+                return "dungeon built and wumpus exists";
+              };
+
+Game.prototype.hideWumpus = function() {
+                var w = this.wumpus;
+
+                // sets location of the wumpus
+                w.location = this.randomRm();
+                this.dungeon.rooms[w.location].wumpus = true;
+              };
+
+Game.prototype.hidePits = function(numberOfPits) {
+                var rooms = this.dungeon.rooms;
+                var pits = this.dungeon.pits;
+                
+                for(var i = 0; i < numberOfPits; i++) {
+                  var roomId = this.randomRm(this.wumpus.location);
+
+                  // make sure pits do not overlap
+                  while(pits.indexOf(roomId) !== -1) {
+                    roomId = this.randomRm(this.wumpus.location);
+                  }
+
+                  pits.push(roomId);
+                  rooms[roomId].pit = true;
+                } 
+              };
+
+Game.prototype.randomRm = function(roomToExlude) {
+                var room = Math.ceil(Math.random() * (this.dungeon.rooms.length - 1));
+                while(room === roomToExlude) {
+                  room = Math.ceil(Math.random() * (this.dungeon.rooms.length - 1));
+                }
+                return room;
+              };
 
 Game.prototype.move = function() {
-  var self = this;
-  return {
-    left: function() {
-      self.player.location = self.dungeon.rooms[self.player.location].adjacentRm1;
-      return "player moved left to room " + self.player.location;
-    },
-    right: function() {
-      self.player.location = self.dungeon.rooms[self.player.location].adjacentRm2;
-      return "player moved right to room " + self.player.location;
-    },
-    up: function() {
-      if (self.player.location < self.dungeon.rooms[self.player.location].nextLvlRm) {
-        self.player.location = self.dungeon.rooms[self.player.location].nextLvlRm;
-        return "player changed levels and moved to room " + self.player.location;
-      } else {
-        return "player cannot go up. player is on highest level. try going down.";
-      }
-    },
-    down: function() {
-      if (self.player.location > self.dungeon.rooms[self.player.location].nextLvlRm) {
-        self.player.location = self.dungeon.rooms[self.player.location].nextLvlRm;
-        return "player changed levels and moved to room " + self.player.location;
-      } else {
-        return "player cannot go down. player is on lowest level. try going up.";
-      }
-    }
-  };
-};
+                var p = this.player;
+                var rooms = this.dungeon.rooms;
 
-Game.prototype.message = function() {
-  var playerRm = this.dungeon.rooms[this.player.location];
-  var wumpusLoc = this.wumpus.location;
-  var pits = this.dungeon.pits;
+                return {
+                  left: function() {
+                    p.location = rooms[p.location].adjacentRm1;
+                  },
+                  right: function() {
+                    p.location = rooms[p.location].adjacentRm2;
+                  },
+                  up: function() {
+                    if (p.location < rooms[p.location].nextLvlRm) {
+                      p.location = rooms[p.location].nextLvlRm;
+                    }
+                  },
+                  down: function() {
+                    if (p.location > rooms[p.location].nextLvlRm) {
+                      p.location = rooms[p.location].nextLvlRm;
+                    }
+                  }
+                };
+              };
 
-  if (playerRm.id === wumpusLoc) {
-    return "ran into the wumpus without a proper weapon. we're dead";
-  } else if (playerRm.adjacentRm1 === wumpusLoc || playerRm.adjacentRm2 === wumpusLoc || playerRm.nextLvlRm === wumpusLoc)  {
-    return "you smell that? we should watch out fo dat wumpus";
-  } else if (pits.indexOf(playerRm.adjacentRm1) !== -1 || pits.indexOf(playerRm.adjacentRm2) !== -1 || pits.indexOf(playerRm.nextLvlRm) !== -1) {
-    return "i pity the fool that falls into that pit";
-  } else if (pits.indexOf(playerRm.id) !== -1) {
-    return "dang, we the fool that fell into a pit";
-  }
+Game.prototype.doesPlayerDie = function() {
+                var p = this.player;
+                var w = this.wumpus;
+                var pits = this.dungeon.pits;
 
-  return "smells fine to me";
-};
+                // killed by the wumpus
+                if(p.location === w.location) {
+                  p.dead = true;
+                  return 1;
+                }
+                // fell into a pit
+                if(pits.indexOf(p.location) !== -1) {
+                  p.dead = true;
+                  return 2;
+                }
+
+                return 0;
+
+              };
+
+Game.prototype.arePitsNearby = function() {
+                var p = this.player;
+                var rooms = this.dungeon.rooms;
+                var pits = this.dungeon.pits;
+
+                if(pits.indexOf(rooms[p.location].adjacentRm1) !== -1) {
+                  return true;
+                }
+                if(pits.indexOf(rooms[p.location].adjacentRm2) !== -1) {
+                  return true;
+                }
+                if(pits.indexOf(rooms[p.location].nextLvlRm) !== -1) {
+                  return true;
+                }
+
+                return false;
+
+              };
+
+Game.prototype.isWumpusNearby = function() {
+                var p = this.player;
+                var w = this.wumpus;
+                var rooms = this.dungeon.rooms;
+
+                if(rooms[p.location].adjacentRm1 === w.location) {
+                  return true;
+                }
+                if(rooms[p.location].adjacentRm2 === w.location) {
+                  return true;
+                }
+                if(rooms[p.location].nextLvlRm === w.location) {
+                  return true;
+                }
+
+                return false;
+
+              };
+
 
 module.exports = Game;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 },{"./dungeon.js":1,"./player.js":3,"./wumpus.js":5}],3:[function(require,module,exports){
 var Player = function() {
-  this.location = 0;
+	this.location = 0;
+	this.hasSword = false;
+	this.dead = false;
 };
 
 module.exports = Player;
@@ -159,57 +220,191 @@ var View = function() {
   this.game = new Game();
 };
 
-View.prototype.display = function(character, className) {
-  var roomNames = ['zero','one','two','three','four','five','six','seven','eight','nine'];
-  var locationId = roomNames[character.location];
 
-  if(document.getElementsByClassName(className).length > 0) {
-    var divId = document.getElementsByClassName(className)[0].id;
-    document.getElementById(divId).classList.remove(className);
-  }
-  document.getElementById(locationId).classList.add(className);
-};
+/*
+ * Loops must be passed in from the outermost loop to the innermost loop.*
+ */
+View.prototype.roomsToNodes = function(radius, difference, rooms) { 
+                var nodes = [];
+                var loops = [];
+
+                for (var i = 0; i < rooms.length; i++) {
+                    var room = rooms[i];
+                    if (room.id >= (rooms.length/2)) {
+                        (loops[0] = loops[0] || []).push(room);
+                    } else {
+                        (loops[1] = loops[1] || []).push(room);
+                    }
+                }
+
+                for (var i = 0; i < loops.length; i++) {
+                    var loop   = loops[i],
+                        scale  = 360 / loops[i].length,
+                        newRadius = radius - i * difference;
+
+                    for (var j = 0; j < loop.length; j++) {
+                        var pos     = (j * scale) % 360
+                            radians = pos * (Math.PI / 180);
+                        nodes.push({
+                            x : newRadius * Math.cos(radians),
+                            y : newRadius * Math.sin(radians),
+                            id : loop[j].id,
+                            left : loop[j].adjacentRm1,
+                            right : loop[j].adjacentRm2,
+                            forward : loop[j].nextLvlRm
+                        });
+                    }
+                }
+                return nodes;
+            };
+
+View.prototype.drawGraph = function(selector, game) {
+                var w = 500,
+                    h = 500;
+
+                var nodes = this.roomsToNodes(200, 100, this.game.dungeon.rooms);
+
+                var graph = d3.select(selector)
+                              .append("svg");
+
+                graph.attr("width", w)
+                   .attr("height", h)
+                   .text("Our Graph")
+                   .select(selector);
+
+                graph.selectAll("circle.nodes")
+                     .data(nodes)
+                     .enter()
+                     .append("svg:circle")
+                     .attr("cx", function(d) { return d.x + w/2; })
+                     .attr("cy", function(d) { return d.y + h/2; });
+
+                graph.selectAll("circle.nodes")
+                     .data(nodes)
+                     .enter()
+                     .append("svg:circle")
+                     .attr("cx", function(d) { return d.x + w/2; })
+                     .attr("cy", function(d) { return d.y + h/2; })
+                     .attr("r", "20px")
+                     .style("stroke", "black")     
+                     .style("stroke-width", 0.25)
+                     .style("fill", function(node) { 
+                         if (game.player.location === node.id) {
+                             return "url(#toon)";
+                         } else {
+                             return "transparent";
+                         }
+                     });
+
+                var links = nodes.sort(function(a, b) {
+                    if (a.id > b.id) {
+                        return 1;
+                    } else if (a.id < b.id) {
+                        return -1;
+                    }
+                    return 0;
+                });
+
+                graph.selectAll(".line")
+                     .data(links)
+                     .enter()
+                     .append("line")
+                     .attr("x1", function(d) { return d.x + w/2; })
+                     .attr("y1", function(d) { return d.y + h/2; })
+                     .attr("x2", function(d) { return links[d.left].x + w/2; })
+                     .attr("y2", function(d) { return links[d.left].y + h/2; })
+                     .style("stroke", "rgb(6,120,155)");
+
+                graph.selectAll(".line")
+                     .data(links)
+                     .enter()
+                     .append("line")
+                     .attr("x1", function(d) { return d.x + w/2; })
+                     .attr("y1", function(d) { return d.y + h/2; })
+                     .attr("x2", function(d) { return links[d.right].x + w/2; })
+                     .attr("y2", function(d) { return links[d.right].y + h/2; })
+                     .style("stroke", "rgb(6,120,155)");
+
+                graph.selectAll(".line")
+                     .data(links)
+                     .enter()
+                     .append("line")
+                     .attr("x1", function(d) { return d.x + w/2; })
+                     .attr("y1", function(d) { return d.y + h/2; })
+                     .attr("x2", function(d) { return links[d.forward].x + w/2; })
+                     .attr("y2", function(d) { return links[d.forward].y + h/2; })
+                     .style("stroke", "rgb(6,120,155)");
+            };
 
 View.prototype.displayMessage = function() {
-  var messageArea = document.getElementById('message-area');
-  messageArea.innerHTML = this.game.message();
-};
+                var messageArea = document.getElementById('message-area');
+                messageArea.innerHTML = this.message();
+            };
+
+View.prototype.message = function() {
+                if(this.game.doesPlayerDie() == 1) {
+                    return "Mr. T says: \n Dang, we got a wompus from the wumpus. We're dead fool!";
+                } else if (this.game.doesPlayerDie() == 2) {
+                    return "Mr. T says: \n Dang, we da fool dat fell in to da pit. We're dead fool!";
+                } else if (this.game.arePitsNearby()) {
+                    return "Mr. T says: \n I pity da fool that'd fall in to dat pit.";
+                } else if (this.game.isWumpusNearby()) {
+                    return "Mr. T says: \n Whoa, watch out fool. I smell a wumpus in the next room.";
+                }
+
+                return "Mr. T says: Everything smells fine.";
+            };
 
 View.prototype.keyHandler = function(e) {
-    if (e.keyCode === 37) {
-      this.game.move().left();
-      this.display(this.game.player, 'hunter');
-      this.displayMessage();
-  }
-  if (e.keyCode === 38) {
-      this.game.move().up();
-      this.display(this.game.player, 'hunter');
-      this.displayMessage();
-  }
-  if (e.keyCode === 39) {
-      this.game.move().right();
-      this.display(this.game.player, 'hunter');
-      this.displayMessage();
-  }
-  if (e.keyCode === 40) {
-      this.game.move().down();
-      this.display(this.game.player, 'hunter');
-      this.displayMessage();
-  }
-};
+                if (e.keyCode === 37) {
+                    this.game.move().left();
+                    this.displayMessage();
 
-var wumpus = new View;
+                    // removes previous graph, then draws new graph
+                    d3.select("#graph").select('svg').remove();
+                    this.drawGraph("#graph", this.game);
+                }
+
+                if (e.keyCode === 38) {
+                    this.game.move().up();
+                    this.displayMessage();
+
+                    // removes previous graph, then draws new graph
+                    d3.select("#graph").select('svg').remove();
+                    this.drawGraph("#graph", this.game);
+                }
+
+                if (e.keyCode === 39) {
+                    this.game.move().right();
+                    this.displayMessage();
+                    
+                    // removes previous graph, then draws new graph
+                    d3.select("#graph").select('svg').remove();
+                    this.drawGraph("#graph", this.game);
+                }
+
+                if (e.keyCode === 40) {
+                    this.game.move().down();
+                    this.displayMessage();
+                    
+                    // removes previous graph, then draws new graph
+                    d3.select("#graph").select('svg').remove();
+                    this.drawGraph("#graph", this.game);
+                }
+            };
+
+var wumpus = new View();
 wumpus.game.start();
-wumpus.display(wumpus.game.player, 'hunter');
-wumpus.display(wumpus.game.wumpus, 'wumpus');
+wumpus.drawGraph("#graph", wumpus.game);
 wumpus.displayMessage();
+console.log(wumpus.game.dungeon.pits, wumpus.game.wumpus.location);
 
 document.onkeydown = function(e) {
-  wumpus.keyHandler(e);
-};
+            wumpus.keyHandler(e);
+        };
 },{"./game.js":2}],5:[function(require,module,exports){
 var Wumpus = function() {
-	this.location = 0;
+	this.location = 1;
 };
 
 module.exports = Wumpus;

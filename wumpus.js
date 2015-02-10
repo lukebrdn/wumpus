@@ -1,5 +1,5 @@
 var Wumpus = function() {
-	this.location = 0;
+	this.location = 1;
 };
 
 module.exports = Wumpus;
