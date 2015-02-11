@@ -121,11 +121,12 @@ View.prototype.drawGraph = function(selector, game) {
 
 View.prototype.displayMessage = function() {
                 var messageArea = document.getElementById('message-area');
-                messageArea.innerHTML = this.message();
+                messageArea.innerHTML = this.message() + "<br />" +"Death count: " + this.game.player.deadCount;
             };
 
 View.prototype.message = function() {
-                var message = "Mr. T says:";
+                var intro = "Mr. T says: ";
+                var message = "";
                 
                 var count = 0;
                 if(this.game.isSwordInRoom()) {
@@ -134,17 +135,26 @@ View.prototype.message = function() {
                 }
 
                 if(this.game.arePitsNearby()) {
-                    message += " There's a pit nearby. Watch out fool.";
+                    if (count > 1) {
+                        message = " Also, t";
+                    } else {
+                        message = " T";
+                    }
+                    message += "here's a pit nearby. Watch out fool.";
                     count++;
                 }
 
                 if(this.game.isWumpusNearby()) {
+                    if(count > 0) {
+                        message += " Also,"
+                    }
                     message += " I smell a wumpus. I hope you brought your sword.";
                     count++;
                 }
 
-                if(this.game.isPlayerDead()) {
-                    message += " Dang, we're dead fool.";
+                if(this.game.isPlayerDead()) { 
+                    message = " Dang, we're dead fool.";
+                    this.game.player.deadCount++;
                     count++;
                 }
 
@@ -153,7 +163,7 @@ View.prototype.message = function() {
                         message = "Mr. T says: That's one dead wumpus.";
                         count++;
                     } else {
-                        messsage += " We should have brought a sword."
+                        message += " We should have brought a sword. The wumpus got us.";
                         count++;
                     }
                 }
@@ -162,7 +172,7 @@ View.prototype.message = function() {
                     message += " We're safe, for now.";
                 }
 
-                return message;
+                return intro + message;
             };
 
 View.prototype.keyHandler = function(e) {
@@ -207,7 +217,6 @@ var wumpus = new View();
 wumpus.game.start();
 wumpus.drawGraph("#graph", wumpus.game);
 wumpus.displayMessage();
-console.log(wumpus.game.dungeon.rooms, wumpus.game.player);
 
 document.onkeydown = function(e) {
             wumpus.keyHandler(e);
