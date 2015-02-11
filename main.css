@@ -1,3 +1,7 @@
+body {
+		font-family: "monaco", monospace, sans-serif;
+}
+
 div#graph {
 	text-align: center;
 }
@@ -6,12 +10,25 @@ svg circle.toon {
 	fill: url(#toon) !important;
 }
 
-#message-area {
+#intro {
 	text-align: center;
-	width: 80%;
+	width: 50%;
+	margin: 20px auto;
+	padding-bottom: 20px;
+	border-bottom: 1px solid #ccc;
+	color: #333;
+}
+
+#death-count {
+	text-align: center;
+	margin-top: 25px;
+	color: #333;
+}
+
+#message-area {
+	text-align: left;
+	width: 50%;
 	margin: 0 auto;
 
-	font-family: "monaco", monospace, sans-serif;
-	font-size: 2em;
 	color: #333;
 }

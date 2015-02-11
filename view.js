@@ -119,9 +119,14 @@ View.prototype.drawGraph = function(selector, game) {
                      .style("stroke", "rgb(6,120,155)");
             };
 
+View.prototype.displayDeathCount = function() {
+                var deathCount = document.getElementById('death-count');
+                deathCount.innerHTML = "Death count: " + this.game.player.deadCount;
+            };
+
 View.prototype.displayMessage = function() {
                 var messageArea = document.getElementById('message-area');
-                messageArea.innerHTML = this.message() + "<br />" +"Death count: " + this.game.player.deadCount;
+                messageArea.innerHTML = this.message();
             };
 
 View.prototype.message = function() {
@@ -135,8 +140,8 @@ View.prototype.message = function() {
                 }
 
                 if(this.game.arePitsNearby()) {
-                    if (count > 1) {
-                        message = " Also, t";
+                    if (count > 0) {
+                        message += " Also, t";
                     } else {
                         message = " T";
                     }
@@ -160,7 +165,7 @@ View.prototype.message = function() {
 
                 if(this.game.player.location === this.game.wumpus.location) {
                     if(this.game.player.hasSword) {
-                        message = "Mr. T says: That's one dead wumpus.";
+                        message = " That's one dead wumpus.";
                         count++;
                     } else {
                         message += " We should have brought a sword. The wumpus got us.";
@@ -178,6 +183,7 @@ View.prototype.message = function() {
 View.prototype.keyHandler = function(e) {
                 if (e.keyCode === 37) {
                     this.game.move().left();
+                    this.displayDeathCount();
                     this.displayMessage();
 
                     // removes previous graph, then draws new graph
@@ -187,6 +193,7 @@ View.prototype.keyHandler = function(e) {
 
                 if (e.keyCode === 38) {
                     this.game.move().up();
+                    this.displayDeathCount();
                     this.displayMessage();
 
                     // removes previous graph, then draws new graph
@@ -196,6 +203,7 @@ View.prototype.keyHandler = function(e) {
 
                 if (e.keyCode === 39) {
                     this.game.move().right();
+                    this.displayDeathCount();
                     this.displayMessage();
                     
                     // removes previous graph, then draws new graph
@@ -205,6 +213,7 @@ View.prototype.keyHandler = function(e) {
 
                 if (e.keyCode === 40) {
                     this.game.move().down();
+                    this.displayDeathCount();
                     this.displayMessage();
                     
                     // removes previous graph, then draws new graph
@@ -217,6 +226,7 @@ var wumpus = new View();
 wumpus.game.start();
 wumpus.drawGraph("#graph", wumpus.game);
 wumpus.displayMessage();
+wumpus.displayDeathCount();
 
 document.onkeydown = function(e) {
             wumpus.keyHandler(e);
