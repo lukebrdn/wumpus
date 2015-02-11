@@ -7,6 +7,7 @@ var Game = function() {
       this.dungeon = new Dungeon();
       this.wumpus = new Wumpus();
       this.started = false;
+      this.pitCount = 0;
     };
 
 Game.prototype.start = function() {
@@ -24,7 +25,7 @@ Game.prototype.start = function() {
                 this.hideWumpus();
 
                 // generates 2 pits
-                this.hidePits(2);
+                this.hidePits(this.pitCount);
 
                 // hides sword
                 this.hideSword();
